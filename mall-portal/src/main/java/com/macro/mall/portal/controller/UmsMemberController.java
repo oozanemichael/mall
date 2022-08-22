@@ -38,23 +38,9 @@ public class UmsMemberController {
     @ApiOperation("会员注册")
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     @ResponseBody
-    public CommonResult register(@RequestParam String username,
-                                 @RequestParam String password,
-                                 @RequestParam String telephone,
+    public CommonResult register(@RequestParam String telephone,
                                  @RequestParam String authCode) {
-        memberService.register(username, password, telephone, authCode);
-        return CommonResult.success(null,"注册成功");
-    }
-
-    @ApiOperation("会员登录")
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    @ResponseBody
-    public CommonResult login(@RequestParam String username,
-                              @RequestParam String password) {
-        String token = memberService.login(username, password);
-        if (token == null) {
-            return CommonResult.validateFailed("用户名或密码错误");
-        }
+        String token = memberService.register(telephone, authCode);
         Map<String, String> tokenMap = new HashMap<>();
         tokenMap.put("token", token);
         tokenMap.put("tokenHead", tokenHead);

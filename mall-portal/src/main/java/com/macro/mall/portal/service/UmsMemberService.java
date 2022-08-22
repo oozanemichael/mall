@@ -20,10 +20,14 @@ public interface UmsMemberService {
     UmsMember getById(Long id);
 
     /**
-     * 用户注册
+     * 用户注册/登入
      */
+    String register(String telephone, String authCode);
+
     @Transactional
-    void register(String username, String password, String telephone, String authCode);
+    void insertMember(String telephone);
+
+    String login(String telephone, String password);
 
     /**
      * 生成验证码
@@ -51,11 +55,6 @@ public interface UmsMemberService {
      * 获取用户信息
      */
     UserDetails loadUserByUsername(String username);
-
-    /**
-     * 登录后获取token
-     */
-    String login(String username, String password);
 
     /**
      * 刷新token

@@ -55,11 +55,13 @@ public class UmsMemberServiceImpl implements UmsMemberService {
     private Long AUTH_CODE_EXPIRE_SECONDS;
 
     @Override
-    public UmsMember getByUsername(String username) {
-        UmsMember member = memberCacheService.getMember(username);
-        if(member!=null) return member;
+    public UmsMember getByUsername(String telephone) {
+        UmsMember member = memberCacheService.getMember(telephone);
+        if(member!=null){
+            return member;
+        }
         UmsMemberExample example = new UmsMemberExample();
-        example.createCriteria().andUsernameEqualTo(username);
+        example.createCriteria().andPhoneEqualTo(telephone);
         List<UmsMember> memberList = memberMapper.selectByExample(example);
         if (!CollectionUtils.isEmpty(memberList)) {
             member = memberList.get(0);
@@ -75,24 +77,39 @@ public class UmsMemberServiceImpl implements UmsMemberService {
     }
 
     @Override
-    public void register(String username, String password, String telephone, String authCode) {
+    public String register(String telephone, String authCode) {
         //验证验证码
         if(!verifyAuthCode(authCode,telephone)){
             Asserts.fail("验证码错误");
         }
+        String token = null;
+
         //查询是否已有该用户
         UmsMemberExample example = new UmsMemberExample();
-        example.createCriteria().andUsernameEqualTo(username);
-        example.or(example.createCriteria().andPhoneEqualTo(telephone));
+        example.createCriteria().andPhoneEqualTo(telephone);
         List<UmsMember> umsMembers = memberMapper.selectByExample(example);
-        if (!CollectionUtils.isEmpty(umsMembers)) {
-            Asserts.fail("该用户已经存在");
+        if (CollectionUtils.isEmpty(umsMembers)) {
+            insertMember(telephone);
         }
+        //密码需要客户端加密后传递
+        try {
+            UserDetails userDetails = loadUserByUsername(telephone);
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            token = jwtTokenUtil.generateToken(userDetails);
+        } catch (AuthenticationException e) {
+            LOGGER.warn("登录异常:{}", e.getMessage());
+        }
+        return token;
+    }
+
+    @Override
+    public void insertMember(String telephone) {
         //没有该用户进行添加操作
         UmsMember umsMember = new UmsMember();
-        umsMember.setUsername(username);
+        //todo 用户名
+        umsMember.setUsername("001");
         umsMember.setPhone(telephone);
-        umsMember.setPassword(passwordEncoder.encode(password));
         umsMember.setCreateTime(new Date());
         umsMember.setStatus(1);
         //获取默认会员等级并设置
@@ -103,7 +120,6 @@ public class UmsMemberServiceImpl implements UmsMemberService {
             umsMember.setMemberLevelId(memberLevelList.get(0).getId());
         }
         memberMapper.insert(umsMember);
-        umsMember.setPassword(null);
     }
 
     @Override
@@ -153,8 +169,8 @@ public class UmsMemberServiceImpl implements UmsMemberService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) {
-        UmsMember member = getByUsername(username);
+    public UserDetails loadUserByUsername(String telephone) {
+        UmsMember member = getByUsername(telephone);
         if(member!=null){
             return new MemberDetails(member);
         }
@@ -162,11 +178,11 @@ public class UmsMemberServiceImpl implements UmsMemberService {
     }
 
     @Override
-    public String login(String username, String password) {
+    public String login(String telephone, String password) {
         String token = null;
         //密码需要客户端加密后传递
         try {
-            UserDetails userDetails = loadUserByUsername(username);
+            UserDetails userDetails = loadUserByUsername(telephone);
             if(!passwordEncoder.matches(password,userDetails.getPassword())){
                 throw new BadCredentialsException("密码不正确");
             }

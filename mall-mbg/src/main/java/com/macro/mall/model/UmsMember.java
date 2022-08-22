@@ -86,6 +86,7 @@ public class UmsMember implements Serializable {
         this.username = username;
     }
 
+    //todo 密码
     public String getPassword() {
         return password;
     }
@@ -223,6 +224,7 @@ public class UmsMember implements Serializable {
         sb.append(", id=").append(id);
         sb.append(", memberLevelId=").append(memberLevelId);
         sb.append(", username=").append(username);
+        //todo 密码
         sb.append(", password=").append(password);
         sb.append(", nickname=").append(nickname);
         sb.append(", phone=").append(phone);

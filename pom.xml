@@ -144,17 +144,30 @@
                 <version>${swagger-annotations.version}</version>
             </dependency>
             <!-- MyBatis 生成器 -->
+<!--            <dependency>-->
+<!--                <groupId>org.mybatis.generator</groupId>-->
+<!--                <artifactId>mybatis-generator-core</artifactId>-->
+<!--                <version>${mybatis-generator.version}</version>-->
+<!--            </dependency>-->
+<!--            &lt;!&ndash; MyBatis&ndash;&gt;-->
+<!--            <dependency>-->
+<!--                <groupId>org.mybatis</groupId>-->
+<!--                <artifactId>mybatis</artifactId>-->
+<!--                <version>${mybatis.version}</version>-->
+<!--            </dependency>-->
+
+            <!-- mybatis plus 代码生成器 -->
             <dependency>
-                <groupId>org.mybatis.generator</groupId>
-                <artifactId>mybatis-generator-core</artifactId>
-                <version>${mybatis-generator.version}</version>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>3.5.2</version>
             </dependency>
-            <!-- MyBatis-->
             <dependency>
-                <groupId>org.mybatis</groupId>
-                <artifactId>mybatis</artifactId>
-                <version>${mybatis.version}</version>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-generator</artifactId>
+                <version>3.5.2</version>
             </dependency>
+
             <!--Mysql数据库驱动-->
             <dependency>
                 <groupId>mysql</groupId>
